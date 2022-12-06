@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="manifest" href="manifest.json">
+  </head>
+  <body>
+    <button id="install-button" style="display: none;">Install me</button>
+    <script>
+      let deferredPrompt;
+
+      // Register a listener for the 'beforeinstallprompt' event
+      window.addEventListener('beforeinstallprompt', function(event) {
+        // Prevent the default install prompt from being shown
+        event.preventDefault();
+
+        // Store the event so it can be triggered later
+        deferredPrompt = event;
+
+        // Update the UI to show the "install me" button
+        document.getElementById('install-button').style.display = 'block';
+      });
+
+      // Register a listener for the 'appinstalled' event
+      window.addEventListener('appinstalled', function(event) {
+        // Update the UI to indicate that the PWA is installed
+        document.getElementById('install-button').style.display = 'none';
+        document.getElementById('installed-message').style.display = 'block';
+      });
+
+      // Handle the 'install me' button click
+      document.getElementById('install-button').addEventListener('click', function(event) {
+        // Hide the "install me" button
+        event.target.style.display = 'none';
+
+        // Show the install prompt
+        deferredPrompt.prompt();
+
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then(function(choiceResult) {
+          // Handle the response
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          } else {
+            console.log('User dismissed the install prompt');
+          }
+        });
+      });
+    </script>
+    <div id="installed-message" style="display: none;">
+      The PWA is installed!
+    </div>
+  </body>
+</html>
